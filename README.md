@@ -32,8 +32,8 @@ Installation
 
     bash
 
-git clone https://github.com/yourusername/quiz-game-flask.git
-cd quiz-game-flask
+git clone https://github.com/ALWIN72/INSCRIBE_APP.git
+
 
 Install the required dependencies:
 
@@ -105,6 +105,3 @@ Future Improvements
     Time Limit: Add a time limit for each question to increase difficulty.
     Better Error Handling: Improve error messages and handling of external API errors.
 
-License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
