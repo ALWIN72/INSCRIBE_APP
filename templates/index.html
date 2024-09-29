@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INSCRBE</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 100%;
+            padding: 20px;
+            margin: 10px;
+            text-align: center;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        h1 {
+            font-size: 2em;
+            color: #333;
+            transition: color 0.3s ease;
+        }
+
+        p {
+            font-size: 1.1em;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 1em;
+        }
+
+        button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #218838;
+            transform: scale(1.05);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        #quit-game {
+            background-color: #dc3545;
+            margin-top: 20px;
+        }
+
+        #quit-game:hover {
+            background-color: #c82333;
+        }
+
+        .error {
+            color: red;
+            font-weight: bold;
+            animation: fadeIn 1s;
+        }
+
+        .success {
+            color: green;
+            font-weight: bold;
+            animation: fadeIn 1s;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #feedback {
+            margin-top: 20px;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        #correct-errors {
+            background-color: #ffc107;
+        }
+
+        #correct-errors:hover {
+            background-color: #e0a800;
+        }
+
+        #question-container, #feedback {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease-in-out;
+        }
+
+        #question-container.active, #feedback.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            h1 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>INSCRIBE</h1>
+        <p>Score: <span id="score">{{ score }}</span></p>
+        <p>Difficulty Level: <span id="difficulty">{{ difficulty_level }}</span></p>
+
+        <div id="quiz-section">
+            <input type="text" id="topic" placeholder="Enter a topic">
+            <button id="generate-quiz">Generate Quiz</button>
+            <div id="question-container" class="hidden">
+                <h3>Question:</h3>
+                <p id="question"></p>
+                <textarea id="user-answer" placeholder="Your answer here..." rows="4"></textarea>
+                <button id="submit-answer">Submit Answer</button>
+            </div>
+            <div id="feedback" class="hidden">
+                <h4>Feedback:</h4>
+                <p id="response-message"></p>
+                <div id="errors"></div>
+                <button id="correct-errors" class="hidden">Correct Errors</button>
+                <div id="corrected-answer" class="hidden">
+                    <h4>Corrected Answer:</h4>
+                    <p id="corrected-text"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quit Game button and form -->
+        <form id="quit-form" method="POST" action="/quit_game">
+            <button type="submit" id="quit-game">Quit Game</button>
+        </form>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Generate Quiz button click
+            $('#generate-quiz').click(function() {
+                const topic = $('#topic').val();
+                $.post('/generate_quiz', { topic: topic }, function(data) {
+                    if (data.question) {
+                        $('#question').text(data.question);
+                        $('#question-container').addClass('active').removeClass('hidden');
+                    } else {
+                        alert(data.error);
+                    }
+                });
+            });
+
+            // Submit Answer button click
+            $('#submit-answer').click(function() {
+                const userAnswer = $('#user-answer').val();
+                $.post('/check_answer', { answer: userAnswer }, function(data) {
+                    $('#response-message').text(data.response_message);
+                    $('#score').text(data.score);
+                    $('#difficulty').text(data.difficulty_level);
+
+                    // Display grammar and spelling errors
+                    let errorsHtml = '';
+                    if (data.grammar_errors.length > 0 || data.spelling_errors.length > 0) {
+                        errorsHtml += '<div class="error"><strong>Errors:</strong><ul>';
+                        data.grammar_errors.forEach(error => {
+                            errorsHtml += `<li>${error}</li>`;
+                        });
+                        data.spelling_errors.forEach(error => {
+                            errorsHtml += `<li>${error}</li>`;
+                        });
+                        errorsHtml += '</ul></div>';
+                        $('#errors').html(errorsHtml);
+                        $('#correct-errors').removeClass('hidden');
+                    } else {
+                        $('#errors').empty();
+                        $('#correct-errors').addClass('hidden');
+                    }
+
+                    // Show feedback section
+                    $('#feedback').addClass('active').removeClass('hidden');
+                });
+            });
+
+            // Correct Errors button click
+            $('#correct-errors').click(function() {
+                const userAnswer = $('#user-answer').val();
+                $.post('/correct_errors', { answer: userAnswer }, function(data) {
+                    $('#corrected-text').text(data.corrected_answer);
+                    $('#corrected-answer').removeClass('hidden');
+                });
+            });
+
+            // Quit Game button click
+            $('#quit-game').click(function(event) {
+                if (!confirm('Are you sure you want to quit the game?')) {
+                    event.preventDefault();  // Prevent form submission if user cancels
+                }
+            });
+        });
+    </script>
+</body>
+</html>
