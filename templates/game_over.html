@@ -4,6 +4,77 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game Over</title>
+    <style>
+        /* Styling the body */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            text-align: center;
+            padding: 50px;
+            margin: 0;
+        }
+
+        /* Styling the game over heading */
+        h1 {
+            font-size: 3em;
+            color: #e74c3c;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        /* Styling the final score */
+        p {
+            font-size: 1.5em;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+
+        /* Styling the return to home button */
+        a {
+            text-decoration: none;
+            font-size: 1.2em;
+            color: #fff;
+            background-color: #3498db;
+            padding: 15px 30px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        /* Hover effect for the button */
+        a:hover {
+            background-color: #2980b9;
+            transform: scale(1.05);
+        }
+
+        /* Animation for fading in the page */
+        body {
+            opacity: 0;
+            animation: fadeIn 1s forwards;
+        }
+
+        /* Keyframe for fade in */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Media query for smaller devices */
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2.5em;
+            }
+
+            p {
+                font-size: 1.2em;
+            }
+
+            a {
+                font-size: 1em;
+                padding: 10px 20px;
+            }
+        }
+    </style>
 </head>
 <body>
     <h1>Game Over</h1>
