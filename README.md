@@ -80,15 +80,9 @@ Usage
     Quit the Game:
         Click "Quit Game" to reset the game and return to the home page.
 
-File Structure
 
-bash
 
-├── templates/
-│   ├── index.html        # Main game page
-│   └── game_over.html    # Page displayed after quitting the game              
-├── app.py                # Flask backend logic
-└── README.md             # Documentation
+
 
 API Routes
 
